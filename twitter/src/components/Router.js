@@ -13,7 +13,7 @@ export default function AppRouter(props) {
         {props.isLoggedIn ? (
           <>
             <Route exact path="/">
-              <Home></Home>
+              <Home userObj={props.userObj}></Home>
             </Route>
             <Route exact path ="/profile">
                 <Profile></Profile>
