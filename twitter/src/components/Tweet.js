@@ -12,12 +12,24 @@ export default function Tweet({ tweetObj, isOwner }) {
   const onEditClick = () => {
     setisEditing((prev) => !prev);
   };
+  const onSubmit = async (event) =>{
+    event.preventDefault();
+    console.log(newTweet)
+    await dbService.doc(`tweets/${tweetObj.id}`).update({
+      tweet: newTweet,
+    })
+    setisEditing(false);
+  }
+  const onChange = (event)=>{
+    const {target: {value}}=event;
+    setnewTweet(value);
+  }
   return (
     <div>
       {isEditing ? (
           <>
-        <form onSubmit={() => (tweetObj.tweet = newTweet)} action="">
-          <input type="text" value={newTweet} />
+        <form onSubmit={onSubmit} action="">
+          <input type="text" onChange={onChange} value={newTweet} />
           <input type="submit" value="edit" />
         </form>
         <button onClick={onEditClick}>cancel</button>
