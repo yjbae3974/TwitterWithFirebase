@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from "react";
-import { dbService } from "fbInstance";
+import { dbService,storageService } from "fbInstance";
 import Tweet from "components/Tweet";
+import {v4 as uuidv4} from 'uuid'
 export default function Home(props) {
   const [tweet, settweet] = useState("");
   const [tweets, settweets] = useState([]);
@@ -13,12 +14,29 @@ export default function Home(props) {
   }, []);
   const onSubmit = async (event) => {
     event.preventDefault();
-    await dbService.collection("tweets").add({
-      tweet,
+    let fileUrl = ""
+    console.log(file);
+    if(file != ''){
+      const fileRef = storageService.ref().child(`${props.userObj.uid}/${uuidv4()}`);
+      const response = await fileRef.putString(file, "data_url"); 
+      fileUrl = await response.ref.getDownloadURL();
+    }
+    console.log(fileUrl)
+    const uptweet = {
+      text: tweet,
       createdAt: Date.now(),
       creator: props.userObj.uid,
-    });
+       attachmentUrl: fileUrl,
+    }
+    await dbService.collection("tweets").add(uptweet);
     settweet("");
+    setfile("");
+    // await dbService.collection("tweets").add({
+    //   tweet,
+    //   createdAt: Date.now(),
+    //   creator: props.userObj.uid,
+    // });
+    // settweet("");
   };
   const onChange = (event) => {
     const {
@@ -65,7 +83,7 @@ export default function Home(props) {
       </form>
       <div>
         {tweets.map((nweet, i) => {
-          console.log(nweet);
+          
           return (
             <>
               <Tweet
